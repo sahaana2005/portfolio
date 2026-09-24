@@ -15,6 +15,7 @@ export default function CharacterHero() {
   const auraPos = React.useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
   const currentAngle = React.useRef(0);
   const [cursorHovered, setCursorHovered] = React.useState(false);
+  const [resumeOpen, setResumeOpen] = React.useState(false);
 
   // DOM elements for cursor
   const cursorDotRef = React.useRef<HTMLDivElement | null>(null);
@@ -245,8 +246,8 @@ export default function CharacterHero() {
         {/* ── TWO STYLISH PILL BUTTONS ── */}
         <div className="hero-buttons-group">
           {/* Resume (Solid white with arrow icon) */}
-          <a
-            href="#resume"
+          <button
+            onClick={() => setResumeOpen(true)}
             className="btn-solid-white"
             onMouseEnter={() => setCursorHovered(true)}
             onMouseLeave={() => setCursorHovered(false)}
@@ -265,7 +266,76 @@ export default function CharacterHero() {
               <line x1="7" y1="17" x2="17" y2="7" />
               <polyline points="7 7 17 7 17 17" />
             </svg>
-          </a>
+          </button>
+
+          {/* ── RESUME MODAL ── */}
+          {resumeOpen && (
+            <div
+              onClick={() => setResumeOpen(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 99999,
+                backgroundColor: "rgba(0,0,0,0.75)",
+                backdropFilter: "blur(6px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "1.5rem",
+              }}
+            >
+              {/* Modal Card */}
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: "relative",
+                  width: "min(860px, 95vw)",
+                  height: "min(90vh, 1100px)",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  boxShadow: "0 32px 80px rgba(0,0,0,0.5)",
+                  background: "#fff",
+                }}
+              >
+                {/* Close button */}
+                <button
+                  onClick={() => setResumeOpen(false)}
+                  style={{
+                    position: "absolute",
+                    top: "12px",
+                    right: "14px",
+                    zIndex: 10,
+                    background: "rgba(0,0,0,0.08)",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: "34px",
+                    height: "34px",
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    lineHeight: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#444",
+                  }}
+                >
+                  ×
+                </button>
+
+                {/* Embedded Google Drive Preview */}
+                <iframe
+                  src="https://drive.google.com/file/d/1PVvSn5gNy8mGlYfyyj5O33OzI1QVbQjo/preview"
+                  title="Sahaana Resume"
+                  allow="autoplay"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Let's Talk (Frosted glass with white border) */}
           <a
