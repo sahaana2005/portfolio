@@ -3,12 +3,21 @@ import * as React from "react";
 const TOTAL_FRAMES = 64;
 const BG_HEX = "#eea3a1";
 
-export default function CharacterHero() {
+export interface CharacterHeroProps {
+  onLetsTalkClick?: () => void;
+  isSplineReady?: boolean;
+}
+
+// Module-level frame cache so re-renders/remounts have zero image load latency
+let cachedCenterFrame: HTMLImageElement | null = null;
+let cachedFrames: HTMLImageElement[] = [];
+
+export default function CharacterHero({ onLetsTalkClick, isSplineReady = false }: CharacterHeroProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   
   // Loaded images store
-  const framesRef = React.useRef<HTMLImageElement[]>([]);
-  const centerFrameRef = React.useRef<HTMLImageElement | null>(null);
+  const framesRef = React.useRef<HTMLImageElement[]>(cachedFrames);
+  const centerFrameRef = React.useRef<HTMLImageElement | null>(cachedCenterFrame);
 
   // Mouse & animation tracking
   const mousePos = React.useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
@@ -23,19 +32,23 @@ export default function CharacterHero() {
 
   // ── 1. PRELOAD ALL 64 WEBP FRAMES + CENTER WEBP ────────────────────────
   React.useEffect(() => {
-    // Preload center
-    const centerImg = new Image();
-    centerImg.src = "/frames/center.webp";
-    centerFrameRef.current = centerImg;
-
-    // Preload 64 circular frames
-    const frames: HTMLImageElement[] = [];
-    for (let i = 0; i < TOTAL_FRAMES; i++) {
-      const img = new Image();
-      img.src = `/frames/frame_${i}.webp`;
-      frames.push(img);
+    if (!cachedCenterFrame) {
+      const centerImg = new Image();
+      centerImg.src = "/frames/center.webp";
+      cachedCenterFrame = centerImg;
     }
-    framesRef.current = frames;
+    centerFrameRef.current = cachedCenterFrame;
+
+    if (cachedFrames.length === 0) {
+      const frames: HTMLImageElement[] = [];
+      for (let i = 0; i < TOTAL_FRAMES; i++) {
+        const img = new Image();
+        img.src = `/frames/frame_${i}.webp`;
+        frames.push(img);
+      }
+      cachedFrames = frames;
+    }
+    framesRef.current = cachedFrames;
   }, []);
 
   // ── 2. MOUSE TRACKING ──────────────────────────────────────────────────
@@ -337,15 +350,34 @@ export default function CharacterHero() {
             </div>
           )}
 
-          {/* Let's Talk (Frosted glass with white border) */}
-          <a
-            href="#contact"
-            className="btn-frosted-white"
+          {/* Let's Talk (Frosted glass with white border - triggers cinematic 3D transition) */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onLetsTalkClick?.();
+            }}
+            className={`btn-frosted-white ${isSplineReady ? "spline-primed" : ""}`}
             onMouseEnter={() => setCursorHovered(true)}
             onMouseLeave={() => setCursorHovered(false)}
+            aria-label="Let's Talk - Enter 3D Interactive Room"
           >
             <span>Let's Talk</span>
-          </a>
+            <span
+              className="spline-status-glow"
+              style={{
+                width: "7px",
+                height: "7px",
+                borderRadius: "50%",
+                backgroundColor: isSplineReady ? "#ffffff" : "rgba(255, 255, 255, 0.45)",
+                boxShadow: isSplineReady
+                  ? "0 0 10px rgba(255, 255, 255, 0.9), 0 0 18px rgba(255, 255, 255, 0.6)"
+                  : "none",
+                transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                display: "inline-block",
+              }}
+            />
+          </button>
         </div>
       </div>
     </div>

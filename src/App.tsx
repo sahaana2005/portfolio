@@ -1,6 +1,6 @@
 import * as React from "react";
 import { GooeyLoader } from "@/components/ui/loader-10";
-import CharacterHero from "@/components/CharacterHero";
+import HeroToSplineTransition from "@/components/HeroToSplineTransition";
 
 export default function App() {
   const [isLoading, setIsLoading]     = React.useState(true);
@@ -66,7 +66,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ── LUXURY CHARACTER HERO SECTION ── */}
+      {/* ── LUXURY CHARACTER HERO & 3D SPLINE TRANSITION ── */}
       <div
         style={{
           width: "100%",
@@ -76,7 +76,7 @@ export default function App() {
           pointerEvents: showContent ? "auto" : "none",
         }}
       >
-        <CharacterHero />
+        <HeroToSplineTransition />
       </div>
     </div>
   );
