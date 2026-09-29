@@ -1,0 +1,74 @@
+[
+  {
+    "name": "spline-portfolio-app",
+    "description": "Cinematic personal portfolio with Spline 3D room, eye-zoom transitions, and neon project showcase — built with React, Vite, and Framer Motion.",
+    "language": "TypeScript",
+    "languageColor": "#3178c6",
+    "stars": 0,
+    "forks": 0,
+    "url": "https://github.com/sahaana2005/PORTFOLIO",
+    "homepage": "",
+    "topics": ["react", "spline", "framer-motion", "portfolio", "3d", "vite"],
+    "featured": true
+  },
+  {
+    "name": "AI-Resume-Screener",
+    "description": "NLP-powered resume screening tool that ranks candidates against job descriptions using TF-IDF and semantic similarity. Built with Python and Streamlit.",
+    "language": "Python",
+    "languageColor": "#3572A5",
+    "stars": 0,
+    "forks": 0,
+    "url": "https://github.com/sahaana2005",
+    "homepage": "",
+    "topics": ["nlp", "python", "streamlit", "machine-learning"],
+    "featured": false
+  },
+  {
+    "name": "gesture-canvas",
+    "description": "Real-time hand-gesture drawing canvas using MediaPipe hand tracking and OpenCV. Draw in the air — no touch required.",
+    "language": "Python",
+    "languageColor": "#3572A5",
+    "stars": 0,
+    "forks": 0,
+    "url": "https://github.com/sahaana2005",
+    "homepage": "",
+    "topics": ["mediapipe", "opencv", "computer-vision", "gesture"],
+    "featured": false
+  },
+  {
+    "name": "SmartBite",
+    "description": "Nutrition-tracking web app that uses food image recognition to estimate macro content. React frontend with a FastAPI backend and a custom CNN model.",
+    "language": "JavaScript",
+    "languageColor": "#f1e05a",
+    "stars": 0,
+    "forks": 0,
+    "url": "https://github.com/sahaana2005",
+    "homepage": "",
+    "topics": ["react", "fastapi", "deep-learning", "health"],
+    "featured": false
+  },
+  {
+    "name": "mini-shell",
+    "description": "A tiny UNIX shell in C supporting piping, I/O redirection, background processes, and built-in commands — written from scratch as a systems project.",
+    "language": "C",
+    "languageColor": "#555555",
+    "stars": 0,
+    "forks": 0,
+    "url": "https://github.com/sahaana2005",
+    "homepage": "",
+    "topics": ["c", "systems", "os", "shell"],
+    "featured": false
+  },
+  {
+    "name": "EchoBoard",
+    "description": "Collaborative real-time whiteboard with voice annotation, built on WebSockets and React. Rooms are ephemeral and peer-to-peer via WebRTC.",
+    "language": "TypeScript",
+    "languageColor": "#3178c6",
+    "stars": 0,
+    "forks": 0,
+    "url": "https://github.com/sahaana2005",
+    "homepage": "",
+    "topics": ["webrtc", "websockets", "react", "collaboration"],
+    "featured": false
+  }
+]

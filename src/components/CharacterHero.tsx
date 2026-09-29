@@ -5,6 +5,8 @@ const BG_HEX = "#eea3a1";
 
 export interface CharacterHeroProps {
   onLetsTalkClick?: () => void;
+  onContactClick?: () => void;
+  onAboutClick?: () => void;
   isSplineReady?: boolean;
 }
 
@@ -12,7 +14,12 @@ export interface CharacterHeroProps {
 let cachedCenterFrame: HTMLImageElement | null = null;
 let cachedFrames: HTMLImageElement[] = [];
 
-export default function CharacterHero({ onLetsTalkClick, isSplineReady = false }: CharacterHeroProps) {
+export default function CharacterHero({
+  onLetsTalkClick,
+  onContactClick,
+  onAboutClick,
+  isSplineReady = false,
+}: CharacterHeroProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   
   // Loaded images store
@@ -233,22 +240,32 @@ export default function CharacterHero({ onLetsTalkClick, isSplineReady = false }
         >
           [WORK]
         </a>
-        <a 
-          href="#about" 
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            onAboutClick?.();
+          }}
           className="nav-link"
           onMouseEnter={() => setCursorHovered(true)}
           onMouseLeave={() => setCursorHovered(false)}
+          style={{ background: "transparent", border: "none" }}
         >
           [ABOUT]
-        </a>
-        <a 
-          href="#contact" 
+        </button>
+        <button 
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            onContactClick?.();
+          }}
           className="nav-link"
           onMouseEnter={() => setCursorHovered(true)}
           onMouseLeave={() => setCursorHovered(false)}
+          style={{ background: "transparent", border: "none" }}
         >
           [CONTACT]
-        </a>
+        </button>
       </header>
 
       {/* ── HERO TYPOGRAPHY (BOTTOM-LEFT) ── */}
