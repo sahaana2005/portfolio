@@ -1,5 +1,19 @@
-import * as React from "react";
-import { motion } from "framer-motion";
+﻿import { motion, type Variants } from "framer-motion";
+import SkincareBackground from "./SkincareBackground";
+
+const bubbleVariants: Variants = {
+  hidden: { opacity: 0, scale: 0, originX: 0.5, originY: 1 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 480,
+      damping: 24,
+      mass: 0.7,
+    },
+  },
+};
 
 export default function AboutSkincare() {
   return (
@@ -13,10 +27,27 @@ export default function AboutSkincare() {
         justifyContent: "center",
         padding: "6rem 1.5rem",
         zIndex: 10,
+        backgroundColor: "#ffe4ec", // Fully opaque soft serum pink base
+        overflow: "hidden",
       }}
     >
+      {/* ── THE LIQUID/SERUM BUBBLE BACKGROUND (glossy pools & rising pulsing droplets) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      >
+        <SkincareBackground />
+      </div>
+
       <div
         style={{
+          position: "relative",
+          zIndex: 2,
           maxWidth: "1080px",
           width: "100%",
           display: "flex",
@@ -25,21 +56,21 @@ export default function AboutSkincare() {
           gap: "2.5rem",
         }}
       >
-        {/* Subtle scrim behind content for legibility against glossy serum background */}
+        {/* Subtle scrim behind content for legibility */}
         <div
           style={{
             position: "absolute",
             inset: "5% 10%",
             borderRadius: "32px",
             background:
-              "radial-gradient(ellipse at center, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 50%, transparent 75%)",
+              "radial-gradient(ellipse at center, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.2) 50%, transparent 75%)",
             filter: "blur(40px)",
             pointerEvents: "none",
             zIndex: -1,
           }}
         />
 
-        {/* ── SKINCARE PHOTO ── */}
+        {/* ── SKINCARE PHOTO (enlarged ~18%) ── */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -47,12 +78,12 @@ export default function AboutSkincare() {
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           style={{
             position: "relative",
-            width: "min(400px, 85vw)",
-            height: "min(500px, 65vh)",
+            width: "min(470px, 90vw)",
+            height: "min(600px, 74vh)",
             borderRadius: "28px",
             overflow: "hidden",
             boxShadow:
-              "0 24px 50px -10px rgba(219, 39, 119, 0.18), 0 10px 24px -5px rgba(219, 39, 119, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.8)",
+              "0 26px 55px -10px rgba(219, 39, 119, 0.22), 0 10px 24px -5px rgba(219, 39, 119, 0.12), 0 0 0 2px rgba(255, 255, 255, 0.9)",
           }}
         >
           <img
@@ -67,7 +98,6 @@ export default function AboutSkincare() {
             }}
           />
 
-          {/* Clean glassy highlight sheen */}
           <div
             style={{
               position: "absolute",
@@ -79,54 +109,73 @@ export default function AboutSkincare() {
           />
         </motion.div>
 
-        {/* ── SKINCARE STATEMENT TEXT ── */}
+        {/* ── SKINCARE SPEECH BUBBLE ── */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={bubbleVariants}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 0.85, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           style={{
+            position: "relative",
+            padding: "1.4rem 2.2rem",
+            borderRadius: "28px",
+            background: "rgba(255, 255, 255, 0.94)",
+            boxShadow:
+              "0 10px 40px rgba(219, 39, 119, 0.16), 0 2px 10px rgba(219, 39, 119, 0.08)",
+            border: "1.5px solid rgba(244, 114, 182, 0.45)",
+            maxWidth: "720px",
+            width: "100%",
             textAlign: "center",
-            maxWidth: "760px",
-            padding: "0 1rem",
           }}
         >
+          {/* Tail pointing up toward photo */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: "-14px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 0,
+              height: 0,
+              borderLeft: "14px solid transparent",
+              borderRight: "14px solid transparent",
+              borderBottom: "15px solid rgba(255, 255, 255, 0.94)",
+              filter: "drop-shadow(0 -3px 4px rgba(219, 39, 119, 0.12))",
+            }}
+          />
+
           {/* Aesthetician badge */}
           <span
             style={{
               display: "inline-block",
               fontFamily: "'Inter', sans-serif",
-              fontSize: "0.75rem",
+              fontSize: "0.72rem",
               fontWeight: 600,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
               color: "#be185d",
-              marginBottom: "1rem",
-              padding: "0.35rem 0.9rem",
+              marginBottom: "0.75rem",
+              padding: "0.3rem 0.85rem",
               borderRadius: "9999px",
-              backgroundColor: "rgba(255, 255, 255, 0.75)",
+              backgroundColor: "rgba(255, 240, 246, 0.9)",
               border: "1px solid rgba(244, 114, 182, 0.4)",
-              backdropFilter: "blur(12px)",
-              boxShadow: "0 4px 14px rgba(219, 39, 119, 0.08)",
             }}
           >
-            Science & Self-Care
+            Science &amp; Self-Care
           </span>
 
-          <h2
+          <p
+            className="story-text"
             style={{
-              fontFamily: "'Syne', 'Inter', sans-serif",
-              fontSize: "clamp(2rem, 4.5vw, 3.25rem)",
-              fontWeight: 700,
-              color: "#831843",
-              lineHeight: 1.25,
-              letterSpacing: "-0.015em",
               margin: 0,
-              textShadow: "0 2px 14px rgba(255, 255, 255, 0.6)",
+              fontSize: "clamp(1.4rem, 3.5vw, 2.2rem)",
+              lineHeight: 1.3,
+              color: "#831843",
             }}
           >
             &ldquo;Geeky about skincare and aestheticians&rdquo;
-          </h2>
+          </p>
         </motion.div>
       </div>
     </section>

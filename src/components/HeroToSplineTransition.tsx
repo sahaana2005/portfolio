@@ -7,7 +7,7 @@ import { ArrowLeft, Sparkles, Orbit } from "lucide-react";
 // Dynamically split Spline runtime chunk, but trigger early preload immediately on app mount
 const Spline = React.lazy(() => import("@splinetool/react-spline"));
 const ContactPhone = React.lazy(() => import("./ContactPhone"));
-const AboutPage = React.lazy(() => import("./AboutPage"));
+const CANVA_ABOUT_URL = "https://saana07.my.canva.site/";
 
 // ── Laptop object names to watch for in the Spline scene ────────────────────
 // These will be matched case-insensitively. Adjust if the exact name differs.
@@ -108,7 +108,7 @@ export default function HeroToSplineTransition({
   const [laptopOrigin, setLaptopOrigin] = React.useState(`${LAPTOP_SCREEN.x} ${LAPTOP_SCREEN.y}`);
   const [showProjectsHint, setShowProjectsHint] = React.useState(false);
   const [isContactOpen, setIsContactOpen] = React.useState(false);
-  const [isAboutOpen, setIsAboutOpen] = React.useState(false);
+  // About navigates to Canva in the same tab — browser Back returns to portfolio
 
   const splineAppRef = React.useRef<any>(null);
   const pendingTransitionRef = React.useRef(false);
@@ -154,6 +154,42 @@ export default function HeroToSplineTransition({
   // Early chunk preload
   React.useEffect(() => {
     import("@splinetool/react-spline").catch(() => {});
+  }, []);
+
+  // Remove Spline watermark badge if injected
+  React.useEffect(() => {
+    const removeSplineBadge = () => {
+      const selectors = [
+        '#spline',
+        '#spline-badge',
+        'a[href*="spline.design"]',
+        'a[href*="spline.com"]',
+        'a[href*="spline"]',
+        '.spline-watermark',
+        '[class*="spline-watermark"]',
+      ];
+      document.querySelectorAll(selectors.join(',')).forEach((el) => {
+        (el as HTMLElement).style.setProperty('display', 'none', 'important');
+        el.remove();
+      });
+
+      document.querySelectorAll('a, div, span').forEach((el) => {
+        if (el.textContent && el.textContent.trim().toLowerCase().includes('built with spline')) {
+          (el as HTMLElement).style.setProperty('display', 'none', 'important');
+          el.remove();
+        }
+      });
+    };
+
+    removeSplineBadge();
+    const interval = setInterval(removeSplineBadge, 150);
+    const observer = new MutationObserver(removeSplineBadge);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      clearInterval(interval);
+      observer.disconnect();
+    };
   }, []);
 
   // ── Helper: is the event target a laptop object? ─────────────────────────
@@ -414,6 +450,82 @@ export default function HeroToSplineTransition({
               </button>
             </div>
 
+            {/* Top Center: Sleek Award-Winning Welcome Title */}
+            <motion.div
+              initial={{ opacity: 0, y: -26, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.18 }}
+              style={{
+                position: "absolute",
+                top: "1.35rem",
+                left: "50%",
+                transform: "translateX(-50%)",
+                textAlign: "center",
+                pointerEvents: "none",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                zIndex: 45,
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.45rem",
+                  padding: "0.26rem 0.95rem",
+                  borderRadius: "9999px",
+                  background: "rgba(255, 255, 255, 0.85)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  border: "1px solid rgba(76, 15, 28, 0.12)",
+                  boxShadow: "0 4px 16px rgba(76, 15, 28, 0.06)",
+                  marginBottom: "0.3rem",
+                }}
+              >
+                <span
+                  style={{
+                    width: "7px",
+                    height: "7px",
+                    borderRadius: "50%",
+                    backgroundColor: "#e01a76",
+                    boxShadow: "0 0 8px #e01a76",
+                    display: "inline-block",
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: "0.68rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: "#6b1429",
+                  }}
+                >
+                  Interactive 3D Space
+                </span>
+              </div>
+
+              <h1
+                style={{
+                  fontFamily: "'Syne', 'Inter', sans-serif",
+                  fontSize: "clamp(1.5rem, 2.3vw, 2.2rem)",
+                  fontWeight: 800,
+                  letterSpacing: "-0.025em",
+                  margin: 0,
+                  lineHeight: 1.15,
+                  background: "linear-gradient(135deg, #2b060d 0%, #5e1124 55%, #c74375 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  filter: "drop-shadow(0 2px 14px rgba(255, 255, 255, 0.9))",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Welcome to my portfolio
+              </h1>
+            </motion.div>
+
             {/* Top Right: Status Badge & Contact Action */}
             <div
               style={{
@@ -432,31 +544,27 @@ export default function HeroToSplineTransition({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.45rem",
-                  padding: "0.55rem 1.15rem",
+                  gap: "0.5rem",
+                  padding: "0.65rem 1.35rem",
                   borderRadius: "9999px",
-                  backgroundColor: "rgba(247, 37, 133, 0.18)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  border: "1px solid rgba(247, 37, 133, 0.4)",
+                  background: "linear-gradient(135deg, #e01a76 0%, #be185d 100%)",
+                  border: "1px solid rgba(224, 26, 118, 0.35)",
                   color: "#ffffff",
-                  fontSize: "0.8rem",
+                  fontSize: "0.85rem",
                   fontFamily: "'Inter', sans-serif",
-                  letterSpacing: "0.04em",
+                  letterSpacing: "0.03em",
                   fontWeight: 600,
-                  boxShadow: "0 0 16px rgba(247, 37, 133, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25)",
+                  boxShadow: "0 8px 24px rgba(224, 26, 118, 0.32), 0 2px 6px rgba(0, 0, 0, 0.08)",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
+                  transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(247, 37, 133, 0.35)";
-                  e.currentTarget.style.boxShadow = "0 0 20px rgba(247, 37, 133, 0.55)";
-                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 12px 30px rgba(224, 26, 118, 0.45)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(247, 37, 133, 0.18)";
-                  e.currentTarget.style.boxShadow = "0 0 16px rgba(247, 37, 133, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25)";
                   e.currentTarget.style.transform = "none";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(224, 26, 118, 0.32), 0 2px 6px rgba(0, 0, 0, 0.08)";
                 }}
                 title="Say Hi / Contact Sahaana"
               >
@@ -468,22 +576,22 @@ export default function HeroToSplineTransition({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.55rem 1.1rem",
+                  gap: "0.55rem",
+                  padding: "0.65rem 1.25rem",
                   borderRadius: "9999px",
-                  backgroundColor: "rgba(255, 255, 255, 0.08)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
-                  color: "rgba(255, 255, 255, 0.9)",
+                  backgroundColor: "rgba(255, 255, 255, 0.88)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  border: "1px solid rgba(76, 15, 28, 0.16)",
+                  color: "#3d0814",
                   fontSize: "0.8rem",
                   fontFamily: "'Inter', sans-serif",
-                  letterSpacing: "0.05em",
-                  fontWeight: 500,
-                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.25)",
+                  letterSpacing: "0.07em",
+                  fontWeight: 700,
+                  boxShadow: "0 8px 24px rgba(76, 15, 28, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)",
                 }}
               >
-                <Sparkles size={14} color="#eea3a1" />
+                <Sparkles size={14} color="#e01a76" />
                 <span>3D INTERACTIVE ROOM</span>
               </div>
             </div>
@@ -662,7 +770,7 @@ export default function HeroToSplineTransition({
             <CharacterHero
               onLetsTalkClick={handleLetsTalkClick}
               onContactClick={() => setIsContactOpen(true)}
-              onAboutClick={() => setIsAboutOpen(true)}
+              onAboutClick={() => { window.location.href = CANVA_ABOUT_URL; }}
               isSplineReady={splineReady}
             />
           </motion.div>
@@ -684,14 +792,7 @@ export default function HeroToSplineTransition({
         />
       </React.Suspense>
 
-      {/* ── ABOUT PAGE OVERLAY ── */}
-      <React.Suspense fallback={null}>
-        <AboutPage
-          isVisible={isAboutOpen}
-          onBack={() => setIsAboutOpen(false)}
-          onContactClick={() => setIsContactOpen(true)}
-        />
-      </React.Suspense>
+      {/* About navigates directly to the Canva site (same tab) */}
     </div>
   );
 }

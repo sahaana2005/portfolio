@@ -1,14 +1,13 @@
-import * as React from "react";
+﻿import * as React from "react";
 import {
   motion,
   AnimatePresence,
   useScroll,
   useTransform,
   useSpring,
+  type Variants,
 } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import DanceBackground from "./about/DanceBackground";
-import SkincareBackground from "./about/SkincareBackground";
 
 // Lazily import the beat sections to keep initial bundle small
 const AboutCredentials = React.lazy(() => import("./about/AboutCredentials"));
@@ -21,17 +20,21 @@ interface AboutPageProps {
   onContactClick?: () => void;
 }
 
-// ── Section-to-background thresholds (scroll progress 0–1) ──────────────────
-// Each beat takes roughly 1/5 of the page scroll.
-// bg opacity values interpolate between:  dark-neon | dance | skincare | dark-neon
-//
-// scrollY progress range → which bg dominates
-// 0.00 – 0.28  →  dark neon (beats 1+2, into credentials)
-// 0.28 – 0.45  →  crossfade neon → dance
-// 0.45 – 0.60  →  dance fully visible
-// 0.60 – 0.72  →  crossfade dance → skincare
-// 0.72 – 0.88  →  skincare fully visible
-// 0.88 – 1.00  →  crossfade skincare → dark neon (return)
+// Spring-pop animation for speech bubbles: scale 0 -> 1.05 -> 1 with fade-in under 400ms
+const bubbleVariants: Variants = {
+  hidden: { opacity: 0, scale: 0 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 480,
+      damping: 24,
+      mass: 0.7,
+      duration: 0.35,
+    },
+  },
+};
 
 export default function AboutPage({
   isVisible,
@@ -52,29 +55,8 @@ export default function AboutPage({
     restDelta: 0.001,
   });
 
-  // ── Dance Background Opacity: peaks at scrollY ≈ 0.45–0.65 ──
-  const danceOpacity = useTransform(
-    smoothProgress,
-    [0.22, 0.38, 0.52, 0.68, 0.78],
-    [0, 1, 1, 1, 0]
-  );
-
-  // ── Skincare Background Opacity: peaks at scrollY ≈ 0.72–0.88 ──
-  const skincareOpacity = useTransform(
-    smoothProgress,
-    [0.60, 0.75, 0.85, 0.93, 1.0],
-    [0, 1, 1, 1, 0]
-  );
-
-  // ── Dark Neon Base Opacity (start + end, dimmed in the middle) ──
-  const neonBgOpacity = useTransform(
-    smoothProgress,
-    [0, 0.22, 0.40, 0.65, 0.82, 1.0],
-    [1, 1, 0, 0, 0.0, 1]
-  );
-
   // Parallax for intro photo (moves up slowly as user scrolls)
-  const introPhotoY = useTransform(smoothProgress, [0, 0.3], [0, -60]);
+  const introPhotoY = useTransform(smoothProgress, [0, 0.3], [0, -50]);
 
   // Escape key to close
   React.useEffect(() => {
@@ -106,7 +88,7 @@ export default function AboutPage({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          transition={{ duration: 0.45, ease: "easeInOut" }}
           style={{
             position: "fixed",
             inset: 0,
@@ -114,61 +96,25 @@ export default function AboutPage({
             width: "100vw",
             height: "100vh",
             overflow: "hidden",
+            backgroundColor: "#f5cad1", // 100% opaque light blush-pink base
           }}
         >
           {/* ════════════════════════════════════════════════════════════
-              LAYERED BACKGROUND SYSTEM — scroll-driven crossfades
+              BASE BACKGROUND: Light Pink Wavy Texture across the whole page
           ════════════════════════════════════════════════════════════ */}
-
-          {/* Layer 1: Dark Neon Background (site default — top/bottom of page) */}
-          <motion.div
+          <div
+            aria-hidden="true"
             style={{
               position: "absolute",
               inset: 0,
-              opacity: neonBgOpacity,
-              background:
-                "radial-gradient(ellipse at 50% 25%, rgba(114, 9, 183, 0.35) 0%, rgba(8, 3, 16, 0.97) 70%)",
+              backgroundColor: "#f5cad1",
+              backgroundImage: "url('/about/pink_wavy_texture.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "repeat-y",
               zIndex: 0,
             }}
           />
-          {/* Neon grid overlay */}
-          <motion.div
-            style={{
-              position: "absolute",
-              inset: 0,
-              opacity: neonBgOpacity,
-              backgroundImage:
-                "linear-gradient(rgba(247, 37, 133, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(247, 37, 133, 0.07) 1px, transparent 1px)",
-              backgroundSize: "44px 44px",
-              zIndex: 1,
-            }}
-          />
-
-          {/* Layer 2: Dance Background — watercolor paper + swaying lotuses */}
-          <motion.div
-            style={{
-              position: "absolute",
-              inset: 0,
-              opacity: danceOpacity,
-              zIndex: 2,
-              pointerEvents: "none",
-            }}
-          >
-            <DanceBackground />
-          </motion.div>
-
-          {/* Layer 3: Skincare Background — glossy serum pool + bubbles */}
-          <motion.div
-            style={{
-              position: "absolute",
-              inset: 0,
-              opacity: skincareOpacity,
-              zIndex: 3,
-              pointerEvents: "none",
-            }}
-          >
-            <SkincareBackground />
-          </motion.div>
 
           {/* ════════════════════════════════════════════════════════════
               SCROLLABLE CONTENT
@@ -184,26 +130,26 @@ export default function AboutPage({
               overflowX: "hidden",
               scrollBehavior: "smooth",
               zIndex: 10,
-              // custom scrollbar
               scrollbarWidth: "thin",
-              scrollbarColor: "rgba(247, 37, 133, 0.3) transparent",
+              scrollbarColor: "rgba(219, 39, 119, 0.4) transparent",
             }}
           >
-            {/* ── TOP NAV BAR ── */}
+            {/* ── TOP NAV BAR (Light frosted glass matching the light pink aesthetic) ── */}
             <header
               style={{
                 position: "sticky",
                 top: 0,
                 zIndex: 50,
-                height: "52px",
+                height: "54px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "0 24px",
-                background: "rgba(8, 3, 16, 0.5)",
+                background: "rgba(255, 245, 248, 0.85)",
                 backdropFilter: "blur(14px)",
                 WebkitBackdropFilter: "blur(14px)",
-                borderBottom: "1px solid rgba(247, 37, 133, 0.12)",
+                borderBottom: "1px solid rgba(220, 100, 140, 0.22)",
+                boxShadow: "0 4px 16px rgba(180, 60, 100, 0.05)",
               }}
             >
               <button
@@ -213,40 +159,41 @@ export default function AboutPage({
                   display: "flex",
                   alignItems: "center",
                   gap: 7,
-                  background: "rgba(255, 255, 255, 0.06)",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
-                  borderRadius: 8,
-                  color: "rgba(255, 255, 255, 0.88)",
-                  fontSize: "0.78rem",
+                  background: "rgba(255, 255, 255, 0.9)",
+                  border: "1px solid rgba(220, 100, 140, 0.3)",
+                  borderRadius: 10,
+                  color: "#541422",
+                  fontSize: "0.8rem",
                   fontFamily: "'Inter', sans-serif",
-                  fontWeight: 500,
-                  padding: "6px 14px",
+                  fontWeight: 600,
+                  padding: "7px 16px",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
+                  boxShadow: "0 2px 6px rgba(180, 60, 100, 0.08)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(247, 37, 133, 0.2)";
+                  e.currentTarget.style.background = "#f72585";
                   e.currentTarget.style.borderColor = "#f72585";
                   e.currentTarget.style.color = "#fff";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)";
-                  e.currentTarget.style.color = "rgba(255, 255, 255, 0.88)";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.9)";
+                  e.currentTarget.style.borderColor = "rgba(220, 100, 140, 0.3)";
+                  e.currentTarget.style.color = "#541422";
                 }}
               >
-                <ArrowLeft size={14} strokeWidth={2.2} />
+                <ArrowLeft size={15} strokeWidth={2.4} />
                 <span>Back</span>
               </button>
 
               <span
                 style={{
                   fontFamily: "'Inter', sans-serif",
-                  fontSize: "0.72rem",
-                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
                   letterSpacing: "0.22em",
                   textTransform: "uppercase",
-                  color: "rgba(255, 255, 255, 0.45)",
+                  color: "#831843",
                 }}
               >
                 About
@@ -262,22 +209,22 @@ export default function AboutPage({
                     gap: 6,
                     background: "rgba(247, 37, 133, 0.12)",
                     border: "1px solid rgba(247, 37, 133, 0.35)",
-                    borderRadius: 8,
-                    color: "#ff6bb3",
-                    fontSize: "0.78rem",
+                    borderRadius: 10,
+                    color: "#be185d",
+                    fontSize: "0.8rem",
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 600,
-                    padding: "6px 14px",
+                    padding: "7px 16px",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(247, 37, 133, 0.28)";
+                    e.currentTarget.style.background = "#f72585";
                     e.currentTarget.style.color = "#ffffff";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = "rgba(247, 37, 133, 0.12)";
-                    e.currentTarget.style.color = "#ff6bb3";
+                    e.currentTarget.style.color = "#be185d";
                   }}
                 >
                   <span>Say Hi</span>
@@ -287,7 +234,7 @@ export default function AboutPage({
             </header>
 
             {/* ════════════════════════════════════════════════
-                BEAT 1 — Greeting Hero
+                BEAT 1 — Greeting Hero (on Light Pink Wavy Texture)
             ════════════════════════════════════════════════ */}
             <section
               style={{
@@ -300,28 +247,11 @@ export default function AboutPage({
                 position: "relative",
               }}
             >
-              {/* Ambient neon glow behind Beat 1 */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: "20%",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  width: "600px",
-                  height: "400px",
-                  borderRadius: "50%",
-                  background:
-                    "radial-gradient(ellipse, rgba(247, 37, 133, 0.18) 0%, rgba(114, 9, 183, 0.12) 50%, transparent 75%)",
-                  filter: "blur(60px)",
-                  pointerEvents: "none",
-                }}
-              />
-
-              {/* Intro Photo with parallax lift */}
+              {/* Intro Photo enlarged ~18% */}
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   position: "relative",
                   y: introPhotoY,
@@ -329,12 +259,12 @@ export default function AboutPage({
               >
                 <div
                   style={{
-                    width: "min(380px, 82vw)",
-                    height: "min(480px, 63vh)",
+                    width: "min(460px, 88vw)",
+                    height: "min(580px, 72vh)",
                     borderRadius: "28px",
                     overflow: "hidden",
                     boxShadow:
-                      "0 28px 60px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(247, 37, 133, 0.25), 0 0 0 1px rgba(255, 77, 166, 0.3)",
+                      "0 24px 60px -10px rgba(140, 40, 70, 0.28), 0 0 35px rgba(247, 37, 133, 0.15), 0 0 0 2px rgba(255, 255, 255, 0.8)",
                   }}
                 >
                   <img
@@ -345,53 +275,72 @@ export default function AboutPage({
                       height: "100%",
                       objectFit: "cover",
                       objectPosition: "center 35%",
+                      display: "block",
                     }}
                   />
-                  {/* Gradient vignette bottom */}
                   <div
                     style={{
                       position: "absolute",
                       inset: 0,
                       background:
-                        "linear-gradient(to bottom, transparent 55%, rgba(8, 3, 16, 0.75) 100%)",
+                        "linear-gradient(to bottom, transparent 60%, rgba(140, 40, 70, 0.35) 100%)",
                       pointerEvents: "none",
                     }}
                   />
                 </div>
               </motion.div>
 
-              {/* Greeting Text */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                style={{ textAlign: "center", marginTop: "2.5rem" }}
-              >
-                <h1
+              {/* Greeting Speech Bubble with Chewy Font */}
+              <div style={{ textAlign: "center", marginTop: "2rem" }}>
+                <motion.div
+                  variants={bubbleVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
                   style={{
-                    fontFamily: "'Syne', 'Inter', sans-serif",
-                    fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
-                    fontWeight: 800,
-                    color: "#ffffff",
-                    letterSpacing: "-0.025em",
-                    margin: 0,
-                    lineHeight: 1.1,
-                    textShadow:
-                      "0 0 30px rgba(247, 37, 133, 0.5), 0 0 60px rgba(247, 37, 133, 0.25)",
+                    position: "relative",
+                    display: "inline-block",
+                    padding: "1.25rem 2.5rem",
+                    borderRadius: "28px",
+                    background: "rgba(255, 255, 255, 0.94)",
+                    boxShadow:
+                      "0 14px 45px rgba(180, 60, 100, 0.18), 0 4px 16px rgba(0, 0, 0, 0.06)",
+                    border: "2px solid rgba(255, 255, 255, 0.9)",
                   }}
                 >
-                  hey y&apos;all, I&apos;m{" "}
-                  <span
+                  {/* Pointed tail pointing upward toward photo */}
+                  <div
+                    aria-hidden="true"
                     style={{
-                      fontFamily: "'Dancing Script', cursive",
-                      color: "#f9a8c9",
-                      fontWeight: 700,
-                      fontSize: "1.15em",
+                      position: "absolute",
+                      top: "-15px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 0,
+                      height: 0,
+                      borderLeft: "15px solid transparent",
+                      borderRight: "15px solid transparent",
+                      borderBottom: "16px solid rgba(255, 255, 255, 0.94)",
+                      filter: "drop-shadow(0 -3px 3px rgba(180, 60, 100, 0.12))",
+                    }}
+                  />
+
+                  <h1
+                    className="story-text"
+                    style={{
+                      fontSize: "clamp(2.4rem, 5.5vw, 4rem)",
+                      color: "#280517",
+                      letterSpacing: "0.01em",
+                      margin: 0,
+                      lineHeight: 1.15,
                     }}
                   >
-                    Saana.
-                  </span>
-                </h1>
+                    hey y&apos;all, I&apos;m{" "}
+                    <span style={{ color: "#e61a7a" }}>
+                      Saana.
+                    </span>
+                  </h1>
+                </motion.div>
 
                 {/* Scroll prompt */}
                 <motion.div
@@ -403,9 +352,10 @@ export default function AboutPage({
                     flexDirection: "column",
                     alignItems: "center",
                     gap: "6px",
-                    color: "rgba(255, 255, 255, 0.4)",
-                    fontSize: "0.72rem",
+                    color: "rgba(84, 20, 34, 0.6)",
+                    fontSize: "0.74rem",
                     fontFamily: "'Inter', sans-serif",
+                    fontWeight: 600,
                     letterSpacing: "0.15em",
                     textTransform: "uppercase",
                   }}
@@ -413,14 +363,14 @@ export default function AboutPage({
                   <span>Scroll to explore</span>
                   <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
                     <rect x="7" y="3" width="2" height="7" rx="1" fill="currentColor" />
-                    <path d="M4 14 L8 20 L12 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M4 14 L8 20 L12 14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </motion.div>
-              </motion.div>
+              </div>
             </section>
 
             {/* ════════════════════════════════════════════════
-                BEAT 2 — Personal Blurb
+                BEAT 2 — Personal Blurb in Speech Bubble (on Light Pink Wavy Texture)
             ════════════════════════════════════════════════ */}
             <section
               style={{
@@ -431,53 +381,82 @@ export default function AboutPage({
                 padding: "5rem 2rem",
               }}
             >
-              <div style={{ maxWidth: "720px", textAlign: "center" }}>
-                <motion.p
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              <div style={{ maxWidth: "800px", width: "100%", textAlign: "center" }}>
+                <motion.div
+                  variants={bubbleVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.35 }}
                   style={{
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: "clamp(1.2rem, 2.8vw, 1.8rem)",
-                    fontWeight: 300,
-                    color: "rgba(255, 255, 255, 0.82)",
-                    lineHeight: 1.75,
-                    letterSpacing: "-0.01em",
+                    position: "relative",
+                    padding: "2rem 2.5rem",
+                    borderRadius: "30px",
+                    background: "rgba(255, 255, 255, 0.94)",
+                    boxShadow:
+                      "0 16px 50px rgba(180, 60, 100, 0.16), 0 4px 16px rgba(0, 0, 0, 0.06)",
+                    border: "2px solid rgba(255, 255, 255, 0.9)",
+                    textAlign: "center",
                   }}
                 >
-                  Computer scientist by training, designer by inclination, and someone who{" "}
-                  <span style={{ color: "#f9a8c9", fontWeight: 500 }}>
-                    genuinely loves being curious
-                  </span>{" "}
-                  about how everything works — from network packets to skin barriers.
-                </motion.p>
+                  {/* Pointed tail pointing upward */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      top: "-15px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 0,
+                      height: 0,
+                      borderLeft: "15px solid transparent",
+                      borderRight: "15px solid transparent",
+                      borderBottom: "16px solid rgba(255, 255, 255, 0.94)",
+                      filter: "drop-shadow(0 -3px 3px rgba(180, 60, 100, 0.12))",
+                    }}
+                  />
+
+                  <p
+                    className="story-text"
+                    style={{
+                      fontSize: "clamp(1.35rem, 2.8vw, 1.85rem)",
+                      color: "#2b0517",
+                      lineHeight: 1.6,
+                      margin: 0,
+                    }}
+                  >
+                    Computer scientist by training, designer by inclination, and someone who{" "}
+                    <span style={{ color: "#d61c74" }}>
+                      genuinely loves being curious
+                    </span>{" "}
+                    about how everything works — from network packets to skin barriers.
+                  </p>
+                </motion.div>
               </div>
             </section>
 
             {/* ════════════════════════════════════════════════
-                BEAT 3 — Credentials (Dark Neon)
+                BEAT 3 — Credentials (Wavy Pink Texture + 5 Bio Speech Bubbles)
             ════════════════════════════════════════════════ */}
             <React.Suspense fallback={null}>
               <AboutCredentials />
             </React.Suspense>
 
             {/* ════════════════════════════════════════════════
-                BEAT 4 — Dance (Blush Watercolor + Lotus)
+                BEAT 4 — Dance (LOTUS FLOWER BACKGROUND)
             ════════════════════════════════════════════════ */}
             <React.Suspense fallback={null}>
               <AboutDance />
             </React.Suspense>
 
             {/* ════════════════════════════════════════════════
-                BEAT 5 — Skincare (Serum Droplet Field)
+                BEAT 5 — Skincare (LIQUID/SERUM BUBBLE BACKGROUND)
             ════════════════════════════════════════════════ */}
             <React.Suspense fallback={null}>
               <AboutSkincare />
             </React.Suspense>
 
             {/* ════════════════════════════════════════════════
-                BEAT 6 — Closing / Back to Work prompt
+                BEAT 6 — Closing / Back to Work prompt (on Light Pink Wavy Texture)
             ════════════════════════════════════════════════ */}
             <section
               style={{
@@ -495,18 +474,60 @@ export default function AboutPage({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
               >
-                <p
+                {/* Closing Speech Bubble */}
+                <motion.div
+                  variants={bubbleVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.4 }}
                   style={{
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: "clamp(1rem, 2.2vw, 1.35rem)",
-                    fontWeight: 400,
-                    color: "rgba(255, 255, 255, 0.6)",
-                    marginBottom: "2rem",
+                    position: "relative",
+                    padding: "1.35rem 2.2rem",
+                    borderRadius: "26px",
+                    background: "rgba(255, 255, 255, 0.94)",
+                    boxShadow:
+                      "0 12px 40px rgba(180, 60, 100, 0.16), 0 4px 12px rgba(0, 0, 0, 0.06)",
+                    border: "2px solid rgba(255, 255, 255, 0.9)",
+                    marginBottom: "2.5rem",
+                    display: "inline-block",
                   }}
                 >
-                  That&apos;s a bit of me. Curious about the work?
-                </p>
+                  <p
+                    className="story-text"
+                    style={{
+                      fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
+                      color: "#2b0517",
+                      margin: 0,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    That&apos;s a bit of me. Curious about the work?
+                  </p>
+
+                  {/* Tail pointing down toward CTA button */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      bottom: "-14px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 0,
+                      height: 0,
+                      borderLeft: "14px solid transparent",
+                      borderRight: "14px solid transparent",
+                      borderTop: "15px solid rgba(255, 255, 255, 0.94)",
+                      filter: "drop-shadow(0 3px 3px rgba(180, 60, 100, 0.12))",
+                    }}
+                  />
+                </motion.div>
+
                 <button
                   type="button"
                   onClick={onBack}
@@ -514,26 +535,26 @@ export default function AboutPage({
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "0.6rem",
-                    padding: "0.8rem 2rem",
+                    padding: "0.85rem 2.2rem",
                     borderRadius: "9999px",
                     background: "linear-gradient(135deg, #f72585 0%, #7209b7 100%)",
                     border: "none",
                     color: "#ffffff",
                     fontFamily: "'Inter', sans-serif",
-                    fontSize: "0.9rem",
+                    fontSize: "0.95rem",
                     fontWeight: 600,
                     letterSpacing: "0.02em",
                     cursor: "pointer",
-                    boxShadow: "0 8px 24px rgba(247, 37, 133, 0.45)",
+                    boxShadow: "0 8px 24px rgba(247, 37, 133, 0.35)",
                     transition: "all 0.25s ease",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
-                    e.currentTarget.style.boxShadow = "0 12px 32px rgba(247, 37, 133, 0.6)";
+                    e.currentTarget.style.boxShadow = "0 12px 32px rgba(247, 37, 133, 0.5)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "none";
-                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(247, 37, 133, 0.45)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(247, 37, 133, 0.35)";
                   }}
                 >
                   <ArrowLeft size={16} strokeWidth={2.2} />
