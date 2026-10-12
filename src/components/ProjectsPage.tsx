@@ -222,7 +222,7 @@ function OsWindow({
           ? `0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px ${item.project.glowColor}`
           : "0 18px 45px rgba(0, 0, 0, 0.75)",
         overflow: "hidden",
-        touchAction: "none",
+        pointerEvents: "auto",
       }}
     >
       {/* Titlebar (Draggable Handle) */}
@@ -239,6 +239,7 @@ function OsWindow({
           borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
           cursor: "grab",
           userSelect: "none",
+          touchAction: "none",
         }}
       >
         <div className="pm-win-controls" style={{ display: "flex", alignItems: "center", gap: "7px" }}>
@@ -340,11 +341,17 @@ function OsWindow({
         </div>
 
         {/* Action Link */}
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", position: "relative", zIndex: 10 }}>
           <a
             href={item.project.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (item.project.url) {
+                window.open(item.project.url, "_blank", "noopener,noreferrer");
+              }
+            }}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -358,6 +365,9 @@ function OsWindow({
               textDecoration: "none",
               boxShadow: `0 4px 16px ${item.project.glowColor}`,
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer",
+              pointerEvents: "auto",
+              userSelect: "none",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-2px)";
@@ -696,6 +706,40 @@ export default function ProjectsPage({
             >
               {clock}
             </span>
+            <a
+              href="https://github.com/sahaana2005"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "5px 12px",
+                background: "rgba(255, 255, 255, 0.08)",
+                border: "1px solid rgba(255, 255, 255, 0.22)",
+                borderRadius: 6,
+                color: "#ffffff",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                textDecoration: "none",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.5)";
+                e.currentTarget.style.boxShadow = "0 0 12px rgba(255, 255, 255, 0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.22)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+              title="Open GitHub Profile"
+            >
+              <ExternalLink size={12} strokeWidth={2.4} />
+              <span>GitHub</span>
+            </a>
             {onContactClick && (
               <button
                 type="button"
