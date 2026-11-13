@@ -56,7 +56,7 @@ A soft, warm, intentionally feminine design language:
 | **3D** | Spline (`react-spline`) |
 | **Smooth scroll** | Lenis |
 | **Icons** | Lucide React |
-| **Hosting** | Netlify |
+| **Hosting** | Vercel |
 
 ---
 
@@ -67,7 +67,7 @@ A soft, warm, intentionally feminine design language:
 - **Embedding a Canva website** as part of an interactive experience
 - Canvas rendering, CSS transitions, and **accessible modal patterns**
 - Animation with **Framer Motion** and **GSAP**
-- **Deploying through Netlify**
+- **Deploying through Vercel**
 
 ---
 
