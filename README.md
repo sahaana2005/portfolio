@@ -91,6 +91,6 @@ npm run build
 
 <div align="center">
 
-Built with 🌸 by **Sahaana Raajkumar**
+Built  by **Sahaana Raajkumar**🌸
 
 </div>
