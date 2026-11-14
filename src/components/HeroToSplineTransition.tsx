@@ -105,7 +105,8 @@ export default function HeroToSplineTransition({
   irisVeilColor = "#0e090c",
   onPhaseChange,
 }: HeroToSplineTransitionProps) {
-  const [phase, setPhase] = React.useState<TransitionPhase>("idle");
+  const isDirectProjects = typeof window !== "undefined" && window.location.search.includes("projects");
+  const [phase, setPhase] = React.useState<TransitionPhase>(isDirectProjects ? "projects-active" : "idle");
   const [splineReady, setSplineReady] = React.useState(false);
   const [showSplineBadge, setShowSplineBadge] = React.useState(true);
   const [laptopHovered, setLaptopHovered] = React.useState(false);

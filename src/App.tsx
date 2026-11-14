@@ -3,11 +3,13 @@ import { GooeyLoader } from "@/components/ui/loader-10";
 import HeroToSplineTransition from "@/components/HeroToSplineTransition";
 
 export default function App() {
-  const [isLoading, setIsLoading]     = React.useState(true);
+  const isDirectProjects = typeof window !== "undefined" && window.location.search.includes("projects");
+  const [isLoading, setIsLoading]     = React.useState(!isDirectProjects);
   const [isFadingOut, setIsFadingOut] = React.useState(false);
-  const [showContent, setShowContent] = React.useState(false);
+  const [showContent, setShowContent] = React.useState(isDirectProjects);
 
   React.useEffect(() => {
+    if (isDirectProjects) return;
     const timer = setTimeout(() => {
       setIsFadingOut(true);
       const removeTimer = setTimeout(() => {
@@ -17,7 +19,7 @@ export default function App() {
       return () => clearTimeout(removeTimer);
     }, 2000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isDirectProjects]);
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", backgroundColor: "#eea3a1" }}>
