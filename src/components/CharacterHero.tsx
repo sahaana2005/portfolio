@@ -18,7 +18,7 @@ export default function CharacterHero({
   onLetsTalkClick,
   onContactClick,
   onAboutClick,
-  isSplineReady = false,
+  isSplineReady: _isSplineReady = false,
 }: CharacterHeroProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   
@@ -232,14 +232,6 @@ export default function CharacterHero({
 
       {/* ── FLOATING FROSTED-GLASS HEADER PILL ── */}
       <header className="floating-nav">
-        <a 
-          href="#work" 
-          className="nav-link"
-          onMouseEnter={() => setCursorHovered(true)}
-          onMouseLeave={() => setCursorHovered(false)}
-        >
-          [WORK]
-        </a>
         <button
           type="button"
           onClick={(e) => {
@@ -253,6 +245,35 @@ export default function CharacterHero({
         >
           [ABOUT]
         </button>
+
+        {/* ── MY SPACE (Bolder glowing text with no outline) ── */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            onLetsTalkClick?.();
+          }}
+          className="nav-link"
+          onMouseEnter={() => setCursorHovered(true)}
+          onMouseLeave={() => setCursorHovered(false)}
+          style={{
+            background: "transparent",
+            border: "none",
+            outline: "none",
+            boxShadow: "none",
+            fontWeight: 800,
+            letterSpacing: "0.12em",
+            color: "#ffffff",
+            textShadow:
+              "0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.85), 0 0 30px rgba(255, 105, 180, 0.65)",
+            cursor: "pointer",
+          }}
+          title="Enter 3D Interactive Room"
+          aria-label="My Space - Enter 3D Interactive Room"
+        >
+          [MY SPACE]
+        </button>
+
         <button 
           type="button"
           onClick={(e) => {
@@ -367,34 +388,7 @@ export default function CharacterHero({
             </div>
           )}
 
-          {/* Let's Talk (Frosted glass with white border - triggers cinematic 3D transition) */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              onLetsTalkClick?.();
-            }}
-            className={`btn-frosted-white ${isSplineReady ? "spline-primed" : ""}`}
-            onMouseEnter={() => setCursorHovered(true)}
-            onMouseLeave={() => setCursorHovered(false)}
-            aria-label="Let's Talk - Enter 3D Interactive Room"
-          >
-            <span>Let's Talk</span>
-            <span
-              className="spline-status-glow"
-              style={{
-                width: "7px",
-                height: "7px",
-                borderRadius: "50%",
-                backgroundColor: isSplineReady ? "#ffffff" : "rgba(255, 255, 255, 0.45)",
-                boxShadow: isSplineReady
-                  ? "0 0 10px rgba(255, 255, 255, 0.9), 0 0 18px rgba(255, 255, 255, 0.6)"
-                  : "none",
-                transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-                display: "inline-block",
-              }}
-            />
-          </button>
+
         </div>
       </div>
     </div>

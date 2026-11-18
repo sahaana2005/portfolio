@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 scratch
+public/frames_backup
 PORTFOLIO/
 
 # Editor directories and files
